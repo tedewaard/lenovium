@@ -1,0 +1,26 @@
+{
+  "name": "lenovium",
+  "version": "1.0.0",
+  "description": "Service to query Lenvo PC Warranty API and send data to Tanium",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tedewaard/lenovium.git"
+  },
+  "author": "Trevor Edewaard",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tedewaard/lenovium/issues"
+  },
+  "homepage": "https://github.com/tedewaard/lenovium#readme",
+  "devDependencies": {
+    "@types/node": "^20.10.5"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  }
+}
