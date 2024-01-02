@@ -1,5 +1,7 @@
-import { testCall } from "./lenovo.js"
+//import { testCall } from "./lenovo.js"
+import { collectTaniumData } from "./tanium.js"
 
 
 
-testCall()
+//testCall()
+collectTaniumData()

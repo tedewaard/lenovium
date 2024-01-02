@@ -1,14 +1,15 @@
 import fetch from 'node-fetch';
-const TOKEN = process.env.TOKEN;
+const LENOVO_TOKEN = process.env.LENOVO_TOKEN;
 const TEST_TARGET = 'https://supportapi.lenovo.com/v2.5/warranty?Serial=PF42ZLHB';
 const BASE_URL = 'https://supportapi.lenovo.com/v2.5/warranty?Serial=';
 //Take array of serial numbers and form a list of target strings
 //Serial=xx,yy,zz
 function createTargetStrings(serialNums) {
+    //List of serial numbers seperated by comma. Start with 50 long
 }
 export async function testCall() {
     var myHeaders = new Headers();
-    myHeaders.append("ClientID", TOKEN);
+    myHeaders.append("ClientID", LENOVO_TOKEN);
     var requestOptions = {
         method: 'GET',
         headers: myHeaders,

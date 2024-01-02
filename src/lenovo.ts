@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 
 
-const LENVO_TOKEN = process.env.LENOVO_TOKEN
+const LENOVO_TOKEN = process.env.LENOVO_TOKEN
 const TEST_TARGET = 'https://supportapi.lenovo.com/v2.5/warranty?Serial=PF42ZLHB'
 const BASE_URL = 'https://supportapi.lenovo.com/v2.5/warranty?Serial='
 
