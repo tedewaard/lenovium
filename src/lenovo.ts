@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+import { Computer } from './tanium.js'
 
 
 const LENOVO_TOKEN = process.env.LENOVO_TOKEN
@@ -21,10 +22,19 @@ interface warranty {
 
 //Take array of serial numbers and form a list of target strings
 //Serial=xx,yy,zz
-function createTargetStrings(serialNums: string[]) {
-   //List of serial numbers seperated by comma. Start with 50 long
-    
+export function createTargetStrings(computers: Computer[]): string[] {
+    const BASE_URL = `https://supportapi.lenovo.com/v2.5/warranty?Serial=`
+    //List of serial numbers seperated by comma. Start with 50 long
+    let targetStrings: string[] = [];
+    let chunkSize = 50;
+    for (let i=0; i < computers.length; i += 50){
+        let chunk = computers.slice(i, i + chunkSize).map(x => x.serial).join();
+        let target = BASE_URL + chunk;
+        targetStrings.push(target);
+    }
+    return targetStrings;
 }
+
 
 
 

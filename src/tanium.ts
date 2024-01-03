@@ -26,7 +26,7 @@ interface TaniumPageInfo {
     hasNextPage: boolean,
     endCursor: string,
 }
-interface Computer {
+export interface Computer {
     name: string,
     serial: string,
 }

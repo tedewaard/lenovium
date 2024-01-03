@@ -4,8 +4,17 @@ const TEST_TARGET = 'https://supportapi.lenovo.com/v2.5/warranty?Serial=PF42ZLHB
 const BASE_URL = 'https://supportapi.lenovo.com/v2.5/warranty?Serial=';
 //Take array of serial numbers and form a list of target strings
 //Serial=xx,yy,zz
-function createTargetStrings(serialNums) {
+export function createTargetStrings(computers) {
+    const BASE_URL = `https://supportapi.lenovo.com/v2.5/warranty?Serial=`;
     //List of serial numbers seperated by comma. Start with 50 long
+    let targetStrings = [];
+    let chunkSize = 50;
+    for (let i = 0; i < computers.length; i += 50) {
+        let chunk = computers.slice(i, i + chunkSize).map(x => x.serial).join();
+        let target = BASE_URL + chunk;
+        targetStrings.push(target);
+    }
+    return targetStrings;
 }
 export async function testCall() {
     var myHeaders = new Headers();
