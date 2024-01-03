@@ -1,11 +1,11 @@
-import { createTargetStrings } from "./lenovo.js"
+import { testCall } from "./lenovo.js"
 import { collectTaniumData } from "./tanium.js"
 
 
 
-//testCall()
-let taniumEndpoints = await collectTaniumData()
+await testCall()
+//let taniumEndpoints = await collectTaniumData()
 
-let test = createTargetStrings(taniumEndpoints);
+//let test = createTargetStrings(taniumEndpoints);
 
-console.log(test);
+//console.log(test);

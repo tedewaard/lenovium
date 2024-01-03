@@ -3,15 +3,9 @@ import { Computer } from './tanium.js'
 
 
 const LENOVO_TOKEN = process.env.LENOVO_TOKEN
-const TEST_TARGET = 'https://supportapi.lenovo.com/v2.5/warranty?Serial=PF42ZLHB'
+const TEST_TARGET = 'https://supportapi.lenovo.com/v2.5/warranty?Serial=PF42ZLHB,MJ0A492A'
+const TEST_TARGET2 = 'https://supportapi.lenovo.com/v2.5/warranty?'
 const BASE_URL = 'https://supportapi.lenovo.com/v2.5/warranty?Serial='
-
-interface warrantyData {
-    Name: string;
-    Type: string;
-    Start: string;
-    End: string;
-}
 
 interface warranty {
     Serial: string;
@@ -20,37 +14,95 @@ interface warranty {
     Warranty: warrantyData[]
 }
 
+interface warrantyData {
+    Name: string;
+    Type: string;
+    Start: string;
+    End: string;
+}
+
+interface computerWarranty {
+    serial: string;
+    endDate: string;
+}
+
+
 //Take array of serial numbers and form a list of target strings
 //Serial=xx,yy,zz
-export function createTargetStrings(computers: Computer[]): string[] {
-    const BASE_URL = `https://supportapi.lenovo.com/v2.5/warranty?Serial=`
+function createTargetStrings(computers: Computer[]): string[] {
     //List of serial numbers seperated by comma. Start with 50 long
     let targetStrings: string[] = [];
     let chunkSize = 50;
     for (let i=0; i < computers.length; i += 50){
         let chunk = computers.slice(i, i + chunkSize).map(x => x.serial).join();
-        let target = BASE_URL + chunk;
+        let target = "Serial=" + chunk;
         targetStrings.push(target);
     }
     return targetStrings;
 }
 
-
-
-
-export async function testCall() {
-    var myHeaders = new Headers();
-    myHeaders.append("ClientID", LENOVO_TOKEN as string);
-
+async function fetchLenovo(targets: string): Promise<warranty[]> {
     var requestOptions = {
-        method: 'GET',
-        headers: myHeaders,
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "ClientID": LENOVO_TOKEN as string
+        },
+        body: encodeURI(targets)
+    }
+    const response = await fetch(TEST_TARGET2, requestOptions); 
+    let data = await response.json();
+    let warranty = JSON.parse(JSON.stringify(data)) as warranty[];
+    //console.log(warranty);
+
+    return warranty;
+}
+
+//Run all of the fetch requests and store data in array
+async function collectWarrantyInfo(targetList: string[]): Promise<warranty[]> {
+    let warranties: warranty[] = [];
+
+    for (let i=0; i < targetList.length; i++){
+        let warrantyFetch = await fetchLenovo(targetList[i]);
+        warranties = warranties.concat(warrantyFetch);
     }
 
-    const response = await fetch(TEST_TARGET, requestOptions); 
+    return warranties
+}
 
+function getLatestDate(warranty: warranty): string {
+
+}
+
+export async function warrantyEndDates(computers: Computer[]): Promise<computerWarranty[]>{
+    let allWarranties = await collectWarrantyInfo(createTargetStrings(computers))
+    let endDates: computerWarranty[] = [];
+    
+    for (let i = 0; i < allWarranties.length; i++){
+        let obj: computerWarranty = {
+            serial: allWarranties[i].Serial,
+            //I need to sift through the warranties and find one with latest date
+            endDate: allWarranties[i].Warranty
+        }
+        endDates.push()
+    }
+}
+
+export async function testCall() {
+    let serials = "Serial=PF42ZLHB,MJ0A492A"
+
+    var requestOptions = {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "ClientID": LENOVO_TOKEN as string
+        },
+        body: encodeURI(serials)
+    }
+    console.log(requestOptions);
+    const response = await fetch(TEST_TARGET2, requestOptions); 
     let data = await response.json();
     let warranty = JSON.parse(JSON.stringify(data)) as warranty;
-    console.log(warranty.Warranty[0].End);
-    console.log(warranty.InWarranty);
+    console.log(warranty);
+
 }
