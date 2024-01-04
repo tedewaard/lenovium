@@ -25,28 +25,72 @@ async function fetchLenovo(targets) {
         },
         body: encodeURI(targets)
     };
-    console.log(requestOptions);
     const response = await fetch(TEST_TARGET2, requestOptions);
     let data = await response.json();
-    console.log(data);
-    return [];
+    let warranty = JSON.parse(JSON.stringify(data));
+    //console.log(warranty);
+    return warranty;
 }
-export function warrantyEndDates() {
+//Run all of the fetch requests and store data in array
+async function collectWarrantyInfo(targetList) {
+    let warranties = [];
+    for (let i = 0; i < targetList.length; i++) {
+        let warrantyFetch = await fetchLenovo(targetList[i]);
+        warranties = warranties.concat(warrantyFetch);
+    }
+    //console.log(warranties)
+    return warranties;
 }
+function getLatestDate(warranty) {
+    console.log(warranty);
+    if (!warranty.hasOwnProperty('Warranty')) {
+        return "NA";
+    }
+    let latestDate = new Date(warranty.Warranty[0].End);
+    for (let i = 0; i < warranty.Warranty.length; i++) {
+        let date = warranty.Warranty[i].End;
+        let convertedDate = new Date(date);
+        if (latestDate <= convertedDate) {
+            latestDate = convertedDate;
+        }
+    }
+    let year = latestDate.toLocaleString("default", { year: "numeric" });
+    let month = latestDate.toLocaleString("default", { month: "2-digit" });
+    let day = latestDate.toLocaleString("default", { day: "2-digit" });
+    let formattedDate = year + "-" + month + "-" + day;
+    return formattedDate;
+}
+export async function warrantyEndDates(computers) {
+    let allWarranties = await collectWarrantyInfo(createTargetStrings(computers));
+    let endDates = [];
+    for (let i = 0; i < allWarranties.length; i++) {
+        let endDate = getLatestDate(allWarranties[i]);
+        let obj = {
+            serial: allWarranties[i].Serial,
+            endDate: endDate
+            //endDate: "test" 
+        };
+        endDates.push(obj);
+    }
+    return endDates;
+}
+/*
 export async function testCall() {
-    let serials = "Serial=PF42ZLHB,MJ0A492A";
+    let serials = "Serial=PF42ZLHB,MJ0A492A"
+
     var requestOptions = {
         method: 'POST',
         headers: {
             "Content-Type": "application/x-www-form-urlencoded",
-            "ClientID": LENOVO_TOKEN
+            "ClientID": LENOVO_TOKEN as string
         },
         body: encodeURI(serials)
-    };
+    }
     console.log(requestOptions);
     const response = await fetch(TEST_TARGET2, requestOptions);
     let data = await response.json();
-    // console.log(data);
-    let warranty = JSON.parse(JSON.stringify(data));
+    let warranty = JSON.parse(JSON.stringify(data)) as warranty;
     console.log(warranty);
+
 }
+*/

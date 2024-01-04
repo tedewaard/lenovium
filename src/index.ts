@@ -1,11 +1,12 @@
-import { testCall } from "./lenovo.js"
+import { warrantyEndDates } from "./lenovo.js"
 import { collectTaniumData } from "./tanium.js"
 
 
 
-await testCall()
-//let taniumEndpoints = await collectTaniumData()
+//await testCall()
+let taniumEndpoints = await collectTaniumData();
 
-//let test = createTargetStrings(taniumEndpoints);
+let warranties = await warrantyEndDates(taniumEndpoints);
 
-//console.log(test);
+console.log(warranties);
+

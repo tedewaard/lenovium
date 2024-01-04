@@ -95,7 +95,7 @@ export async function collectTaniumData(): Promise<Computer[]> {
     let endCursor = firstPage.data.query.pageInfo.endCursor
     while (nextPage){
         let newQuery = formatQuery(endCursor);
-        console.log(newQuery);
+        //console.log(newQuery);
         let nextFetch = await fetchTaniumData(newQuery);
         compArray = compArray.concat(addToArray(nextFetch));
         if (nextFetch.data.query.pageInfo.hasNextPage){
@@ -104,7 +104,7 @@ export async function collectTaniumData(): Promise<Computer[]> {
             nextPage = false;
         }
     }
-    console.log(compArray.length);
-    console.log(compArray);
+    //console.log(compArray.length);
+    //console.log(compArray);
     return compArray;
 }

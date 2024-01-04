@@ -67,11 +67,29 @@ async function collectWarrantyInfo(targetList: string[]): Promise<warranty[]> {
         warranties = warranties.concat(warrantyFetch);
     }
 
+    //console.log(warranties)
     return warranties
 }
 
 function getLatestDate(warranty: warranty): string {
+    if (!warranty.hasOwnProperty('Warranty')) {
+        return "NA"
+    }
+    let latestDate = new Date(warranty.Warranty[0].End);
+    for (let i=0; i < warranty.Warranty.length; i++){
+        let date = warranty.Warranty[i].End
+        let convertedDate = new Date(date);
+        if (latestDate <= convertedDate){
+            latestDate = convertedDate
+        }
+    }
 
+    let year = latestDate.toLocaleString("default",{ year: "numeric" });
+    let month = latestDate.toLocaleString("default",{ month: "2-digit" });
+    let day = latestDate.toLocaleString("default",{ day: "2-digit" });
+    let formattedDate = year + "-" + month + "-" + day;
+
+    return formattedDate
 }
 
 export async function warrantyEndDates(computers: Computer[]): Promise<computerWarranty[]>{
@@ -79,15 +97,18 @@ export async function warrantyEndDates(computers: Computer[]): Promise<computerW
     let endDates: computerWarranty[] = [];
     
     for (let i = 0; i < allWarranties.length; i++){
+        let endDate = getLatestDate(allWarranties[i]) 
         let obj: computerWarranty = {
             serial: allWarranties[i].Serial,
-            //I need to sift through the warranties and find one with latest date
-            endDate: allWarranties[i].Warranty
+            endDate: endDate 
+            //endDate: "test" 
         }
-        endDates.push()
+        endDates.push(obj)
     }
+    return endDates
 }
 
+/*
 export async function testCall() {
     let serials = "Serial=PF42ZLHB,MJ0A492A"
 
@@ -106,3 +127,4 @@ export async function testCall() {
     console.log(warranty);
 
 }
+*/
