@@ -21,7 +21,7 @@ interface warrantyData {
     End: string;
 }
 
-interface computerWarranty {
+export interface computerWarranty {
     serial: string;
     endDate: string;
 }

@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+import { computerWarranty } from './lenovo.js';
 
 const BASE_URL = 'https://hm-api.cloud.tanium.com/plugin/products/gateway/graphql'
 const TANIUM_TOKEN = process.env.TANIUM_TOKEN
@@ -60,7 +61,7 @@ async function fetchTaniumData(query: string): Promise<TaniumResponse> {
     return warranty;
 }
 
-function formatQuery(endCursor: string): string {
+function formatRequestQuery(endCursor: string): string {
     let newQuery = `
         {
         query: endpoints (
@@ -69,8 +70,38 @@ function formatQuery(endCursor: string): string {
           pageInfo {hasNextPage endCursor}}
         }
     `
-    //console.log(newQuery)
     return newQuery
+}
+
+//TODO: How to format the data in this mutation query?
+function formatImportQuery(data: string): string {
+    let newQuery = `
+    {
+        query: mutation importAssets($source: String!, $json: String!) {
+            assetsImport(input: {sourceName: $source, json: $json}) {
+                assets {
+                    id
+                    index
+                    status
+                }
+            }
+        }
+        variables: {
+            "source": "Lenovo Warranty End Date",
+            "json": "${data}"
+        }
+    }
+    `
+    return newQuery
+}
+
+//Apparently one import can handle up to 5000 endpoints
+//TODO: Future proof incase we hit 5000 endpoints
+export function formatImportData(data: computerWarranty[]): string {
+    let s = JSON.stringify(data);
+    //TODO: Test if stringify will work or if I need to add '\' before all the quotes
+    console.log(s)
+    return s
 }
 
 function addToArray(taniumResponse: TaniumResponse): Computer[] {
@@ -94,7 +125,7 @@ export async function collectTaniumData(): Promise<Computer[]> {
     let nextPage = firstPage.data.query.pageInfo.hasNextPage;
     let endCursor = firstPage.data.query.pageInfo.endCursor
     while (nextPage){
-        let newQuery = formatQuery(endCursor);
+        let newQuery = formatRequestQuery(endCursor);
         //console.log(newQuery);
         let nextFetch = await fetchTaniumData(newQuery);
         compArray = compArray.concat(addToArray(nextFetch));
@@ -107,4 +138,9 @@ export async function collectTaniumData(): Promise<Computer[]> {
     //console.log(compArray.length);
     //console.log(compArray);
     return compArray;
+}
+
+
+export async function pushTaniumData() {
+         
 }

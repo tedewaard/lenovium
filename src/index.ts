@@ -1,5 +1,5 @@
 import { warrantyEndDates } from "./lenovo.js"
-import { collectTaniumData } from "./tanium.js"
+import { formatImportData, collectTaniumData } from "./tanium.js"
 
 
 
@@ -8,5 +8,7 @@ let taniumEndpoints = await collectTaniumData();
 
 let warranties = await warrantyEndDates(taniumEndpoints);
 
-console.log(warranties);
+formatImportData(warranties);
+
+//console.log(warranties);
 

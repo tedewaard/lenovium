@@ -29,7 +29,7 @@ async function fetchTaniumData(query) {
     //console.log(warranty.data.query);
     return warranty;
 }
-function formatQuery(endCursor) {
+function formatRequestQuery(endCursor) {
     let newQuery = `
         {
         query: endpoints (
@@ -38,8 +38,35 @@ function formatQuery(endCursor) {
           pageInfo {hasNextPage endCursor}}
         }
     `;
-    //console.log(newQuery)
     return newQuery;
+}
+//TODO: How to format the data in this mutation query?
+function formatImportQuery(data) {
+    let newQuery = `
+    {
+        query: mutation importAssets($source: String!, $json: String!) {
+            assetsImport(input: {sourceName: $source, json: $json}) {
+                assets {
+                    id
+                    index
+                    status
+                }
+            }
+        }
+        variables: {
+            "source": "Lenovo Warranty End Date",
+            "json": "${data}"
+        }
+    }
+    `;
+    return newQuery;
+}
+//Apparently one import can handle up to 5000 endpoints
+//TODO: Future proof incase we hit 5000 endpoints
+export function formatImportData(data) {
+    let s = JSON.stringify(data);
+    console.log(s);
+    return s;
 }
 function addToArray(taniumResponse) {
     let computerArray = [];
@@ -61,7 +88,7 @@ export async function collectTaniumData() {
     let nextPage = firstPage.data.query.pageInfo.hasNextPage;
     let endCursor = firstPage.data.query.pageInfo.endCursor;
     while (nextPage) {
-        let newQuery = formatQuery(endCursor);
+        let newQuery = formatRequestQuery(endCursor);
         //console.log(newQuery);
         let nextFetch = await fetchTaniumData(newQuery);
         compArray = compArray.concat(addToArray(nextFetch));
@@ -75,4 +102,6 @@ export async function collectTaniumData() {
     //console.log(compArray.length);
     //console.log(compArray);
     return compArray;
+}
+export async function pushTaniumData() {
 }

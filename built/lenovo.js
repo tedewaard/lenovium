@@ -42,7 +42,6 @@ async function collectWarrantyInfo(targetList) {
     return warranties;
 }
 function getLatestDate(warranty) {
-    console.log(warranty);
     if (!warranty.hasOwnProperty('Warranty')) {
         return "NA";
     }
