@@ -33,6 +33,21 @@ export interface Computer {
     serial: string,
 }
 
+interface UpdateResponse {
+    data: UpdateData
+}
+interface UpdateData {
+    assetsImport: UpdateAssetsImport
+}
+interface UpdateAssetsImport {
+    assets: UpdateAssets[]
+}
+interface UpdateAssets {
+    id: number,
+    index: number,
+    status: string
+}
+ 
 const INITIAL_QUERY = `
     {
     query: endpoints (
@@ -163,12 +178,24 @@ export async function collectTaniumData(): Promise<Computer[]> {
 
 //export async function updateTaniumData() {
 export async function updateTaniumData(data: computerWarranty[]) {
-
-    //let s = "[{\"serial\": \"MJ0A492A\", \"end_date\": \"2022-11-17\"},{\"serial\": \"PF42QXZ0\", \"end_date\": \"2025-11-30\"},{\"serial\": \"PF2XZ1W5\", \"end_date\": \"2024-09-09\"},{\"serial\": \"PF2XE8VP\", \"end_date\": \"2024-08-26\"},{\"serial\": \"PF3NBQRC\", \"end_date\": \"2025-05-25\"},{\"serial\": \"PF3Y2MK4\", \"end_date\": \"2025-10-09\"}]"
     let formattedData = formatImportData(data);
     let formattedQuery = formatImportQuery(formattedData);
-    //console.log(formattedQuery)
-    //let formattedQuery = formatImportQuery(s);
     let push = await pushTaniumData(formattedQuery);
-    console.log(JSON.stringify(push));
+    let response: UpdateResponse  = JSON.parse(JSON.stringify(push));
+    analyzeResponse(response);
+}
+
+function analyzeResponse(response: UpdateResponse) {
+    let createdCount = 0; 
+    let noChangeCount = 0;
+    let responses = response.data.assetsImport.assets
+    for (let i=0; i< responses.length; i++) {
+        if (responses[i].status == "NoChange"){
+           noChangeCount++;
+        }
+        if (responses[i].status == "Created"){
+            createdCount++;
+        }
+    }
+    console.log("Updates: " + createdCount + "\nNo Updates: " + noChangeCount)
 }

@@ -1,10 +1,6 @@
-Check responses and pretty print how the update went
-    - Number of each response? (Updated, NoChage)
-    - Break out tanium push if over 5k
+Break out tanium push if over 5k
 
 Add Error Handeling
-
-Update Readme
 
 Add some comments
 
