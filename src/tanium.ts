@@ -61,6 +61,20 @@ async function fetchTaniumData(query: string): Promise<TaniumResponse> {
     return warranty;
 }
 
+export async function pushTaniumData(query: string) {
+    var requestOptions = {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json",
+            "session": TANIUM_TOKEN as string
+        },
+        body: query 
+    }
+    const response = await fetch(BASE_URL, requestOptions); 
+    let data = await response.json();
+    return data;
+}
+
 function formatRequestQuery(endCursor: string): string {
     let newQuery = `
         {
@@ -75,39 +89,45 @@ function formatRequestQuery(endCursor: string): string {
 
 //TODO: How to format the data in this mutation query?
 function formatImportQuery(data: string): string {
-    let newQuery = `
-    {
-        query: mutation importAssets($source: String!, $json: String!) {
-            assetsImport(input: {sourceName: $source, json: $json}) {
-                assets {
-                    id
-                    index
-                    status
-                }
-            }
-        }
-        variables: {
-            "source": "Lenovo Warranty End Date",
-            "json": "${data}"
-        }
+    let query = "mutation importAssets($source: String!, $json: String!) {assetsImport(input: {sourceName: $source, json: $json}) {assets {id index status}}}"
+    let json = data;
+
+
+    let variablesString = {
+        "source":"Lenovo Warranty End Date",
+        "json": json
     }
-    `
+
+    let newQuery = JSON.stringify({
+        query: query,
+        variables: variablesString
+    })
     return newQuery
 }
 
 //Apparently one import can handle up to 5000 endpoints
 //TODO: Future proof incase we hit 5000 endpoints
 export function formatImportData(data: computerWarranty[]): string {
-    let s = JSON.stringify(data);
-    //TODO: Test if stringify will work or if I need to add '\' before all the quotes
-    console.log(s)
-    return s
+    let a: string[] = []
+    //"[{\"serial\": \"MJ0FCALB\", \"end_date\": \"2024-12-16\"}, {\"serial\": \"PF2QDS4K\", \"end_date\": \"2022-09-19\"}]"
+    let start = `[`
+    let end = `]`
+    for (let i=0; i<data.length; i++) {
+        let serial = data[i].serial
+        let end_date = data[i].endDate
+        let s = `{\"serial\": \"${serial}\", \"end_date\": \"${end_date}\"}`
+        a.push(s);
+    }
+
+    let joined = a.join()
+    //console.log(start + joined + end);
+
+    return start + joined + end;
 }
 
 function addToArray(taniumResponse: TaniumResponse): Computer[] {
     let computerArray: Computer[] = [];
     let nodes = taniumResponse.data.query.edges
-    //console.log(nodes);
     for (let i = 0; i < nodes.length; i++) {
         let computer: Computer = {
             name: nodes[i].node.name,
@@ -140,7 +160,14 @@ export async function collectTaniumData(): Promise<Computer[]> {
     return compArray;
 }
 
+//export async function updateTaniumData() {
+export async function updateTaniumData(data: computerWarranty[]) {
 
-export async function pushTaniumData() {
-         
+    //let s = "[{\"serial\": \"MJ0A492A\", \"end_date\": \"2022-11-17\"},{\"serial\": \"PF42QXZ0\", \"end_date\": \"2025-11-30\"},{\"serial\": \"PF2XZ1W5\", \"end_date\": \"2024-09-09\"},{\"serial\": \"PF2XE8VP\", \"end_date\": \"2024-08-26\"},{\"serial\": \"PF3NBQRC\", \"end_date\": \"2025-05-25\"},{\"serial\": \"PF3Y2MK4\", \"end_date\": \"2025-10-09\"}]"
+    let formattedData = formatImportData(data);
+    let formattedQuery = formatImportQuery(formattedData);
+    //console.log(formattedQuery)
+    //let formattedQuery = formatImportQuery(s);
+    let push = await pushTaniumData(formattedQuery);
+    console.log(JSON.stringify(push));
 }
