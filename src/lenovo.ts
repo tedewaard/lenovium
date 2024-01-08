@@ -3,9 +3,7 @@ import { Computer } from './tanium.js'
 
 
 const LENOVO_TOKEN = process.env.LENOVO_TOKEN
-const TEST_TARGET = 'https://supportapi.lenovo.com/v2.5/warranty?Serial=PF42ZLHB,MJ0A492A'
-const TEST_TARGET2 = 'https://supportapi.lenovo.com/v2.5/warranty?'
-const BASE_URL = 'https://supportapi.lenovo.com/v2.5/warranty?Serial='
+const BASE_URL = 'https://supportapi.lenovo.com/v2.5/warranty?'
 
 interface warranty {
     Serial: string;
@@ -50,7 +48,7 @@ async function fetchLenovo(targets: string): Promise<warranty[]> {
         },
         body: encodeURI(targets)
     }
-    const response = await fetch(TEST_TARGET2, requestOptions); 
+    const response = await fetch(BASE_URL, requestOptions); 
     let data = await response.json();
     let warranty = JSON.parse(JSON.stringify(data)) as warranty[];
     //console.log(warranty);
@@ -107,24 +105,3 @@ export async function warrantyEndDates(computers: Computer[]): Promise<computerW
     }
     return endDates
 }
-
-/*
-export async function testCall() {
-    let serials = "Serial=PF42ZLHB,MJ0A492A"
-
-    var requestOptions = {
-        method: 'POST',
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-            "ClientID": LENOVO_TOKEN as string
-        },
-        body: encodeURI(serials)
-    }
-    console.log(requestOptions);
-    const response = await fetch(TEST_TARGET2, requestOptions); 
-    let data = await response.json();
-    let warranty = JSON.parse(JSON.stringify(data)) as warranty;
-    console.log(warranty);
-
-}
-*/

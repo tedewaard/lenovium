@@ -1,8 +1,9 @@
 import fetch from 'node-fetch';
 import { computerWarranty } from './lenovo.js';
 
-const BASE_URL = 'https://hm-api.cloud.tanium.com/plugin/products/gateway/graphql'
+const TANIUM_TARGET = process.env.TANIUM_TARGET
 const TANIUM_TOKEN = process.env.TANIUM_TOKEN
+const BASE_URL = `https://${TANIUM_TARGET}-api.cloud.tanium.com/plugin/products/gateway/graphql`
 
 interface TaniumResponse {
     data: TaniumData 

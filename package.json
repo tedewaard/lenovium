@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "npm run build && node --env-file .devenv ./built/index.js",
+    "test": "npm run build && node --env-file .env ./built/index.js",
     "build": "tsc"
   },
   "repository": {
