@@ -38,3 +38,13 @@ TANIUM_TARGET=<Enter your Tanium cloud sub domain. It would be 'contoso' if your
     }
     ```
 - Also under Inventory Management create a new asset custom attribute called "Lenovo Warranty Expiration"
+
+### Run it
+Run either of the following commands at the root of the project:
+```
+npm run tsc && node --env-file .env ./built/index.js
+```
+or
+```
+npm run test
+```
